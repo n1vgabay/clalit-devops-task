@@ -1,0 +1,8 @@
+global:
+  storageClass: "gp2"
+  postgresql:
+    auth:
+      postgresPassword: "94mcsK7G0jR177jd7uDY"
+      username: "postgres"
+      password: "94mcsK7G0jR177jd7uDY"
+      database: "clalit"

@@ -3,17 +3,18 @@ FROM python:alpine3.19
 ARG USER=clalit
 ENV HOME /home/$USER
 
-RUN apk update \
+RUN adduser -D -h $HOME $USER \
     && apk add --no-cache shadow \
-    && adduser -D -h $HOME $USER \
     && chown -R $USER:$USER $HOME
+
+COPY app/app.py app/requirements.txt /app/
+
+WORKDIR /app
+RUN apk add --no-cache libpq \
+    && apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev \
+    && pip install --no-cache-dir -r ./requirements.txt \
+    && apk del .build-deps
+
 USER $USER
-WORKDIR $HOME
-
-COPY app/app.py app/requirements.txt ./app/
-RUN pip install --no-cache-dir -r ./app/requirements.txt
-
 EXPOSE 5000
-WORKDIR $HOME/app
-
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]

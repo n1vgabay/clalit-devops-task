@@ -2,8 +2,8 @@ replicaCount: 1
 
 image:
   repository: n1vgabay/clalit
-  pullPolicy: IfNotPresent
-  tag: "0.0.4"
+  pullPolicy: Always
+  tag: "0.0.10"
 
 imagePullSecrets: []
 
@@ -19,23 +19,10 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
-# podSecurityContext:
-#   fsGroup: 2000
-#   allowPrivilegeEscalation: false
-
 podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
   runAsNonRoot: true
-
-# securityContext:
-#   capabilities:
-#     drop:
-#       - ALL
-#   runAsNonRoot: true
-#   runAsUser: 1000
-#   seccompProfile:
-#     type: RuntimeDefault
 
 securityContext:
   allowPrivilegeEscalation: false
@@ -49,7 +36,7 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 80
+  port: 5000
 
 ingress:
   enabled: false
@@ -81,9 +68,20 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
-volumes: []
+volumes:
+  - name: deployment-volume
+    configMap:
+      name: deployment-configmap
 
-volumeMounts: []
+volumeMounts:
+  - name: deployment-volume
+    mountPath: /app/templates
+
+envs:
+  DB_USER: postgres
+  DB_HOST: postgresql-hl
+  DB_PORT: 5432
+  DB_NAME: postgres
 
 nodeSelector: {}
 
